@@ -1,0 +1,1 @@
+data class Path(val city1: City, val city2: City, val distance: Int)
