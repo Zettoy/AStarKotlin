@@ -8,23 +8,24 @@ fun main() {
     val cities: ArrayList<City> = arrayListOf()
     val pathes: ArrayList<Path> = arrayListOf()
 
-    input.forEachLine {
-        val split = it.split(" ")
-        if (split.size == 2) {
-            cities.add(City(name = split[0], distanceToBucharest = split[1].toInt()))
+    input.forEachLine { line ->
+        val split = line.split(" ")
+        when {
+            split.size == 2 -> cities.add(City(name = split[0], distanceToBucharest = split[1].toInt()))
 
-        } else if (split.size == 3) {
-            var city1: City? = null
-            var city2: City? = null
-            for (city in cities) {
-                if (city.name == split[0]) city1 = city
-                if (city.name == split[1]) city2 = city
-            }
-            if (city1 != null && city2 != null) {
-                pathes.add(Path(city1, city2, split[2].toInt()))
-                pathes.add(Path(city2, city1, split[2].toInt()))
-                city1.connections.add(city2)
-                city2.connections.add(city1)
+            split.size == 3 -> {
+                var city1: City? = null
+                var city2: City? = null
+                for (city in cities) {
+                    if (city.name == split[0]) city1 = city
+                    if (city.name == split[1]) city2 = city
+                }
+                if (city1 != null && city2 != null) {
+                    pathes.add(Path(city1 = city1, city2 = city2, distance = split[2].toInt()))
+                    pathes.add(Path(city1 = city2, city2 = city1, distance = split[2].toInt()))
+                    city1.connections.add(city2)
+                    city2.connections.add(city1)
+                }
             }
         }
     }
@@ -40,31 +41,33 @@ fun main() {
         var curr = queue.poll()
         visited.add(curr)
 
-        for (neighbour in curr.connections) {
-            if (neighbour.name == "Bucharest") {
-                val path: ArrayList<City> = arrayListOf()
-                path.add(0, neighbour)
+        curr.connections.forEach neighbours@{ neighbour ->
+            when {
+                neighbour.name == "Bucharest" -> {
+                    val path: ArrayList<City> = arrayListOf()
+                    path.add(index = 0, element = neighbour)
 
-                while (curr.prev != null) {
-                    path.add(0, curr)
-                    curr = curr.prev
+                    while (curr.prev != null) {
+                        path.add(index = 0, element = curr)
+                        curr = curr.prev
+                    }
+
+                    start?.let { path.add(index = 0, element = it) }
+
+                    path.forEach { println(it.name) }
+                    queue.clear()
+
                 }
 
-                start?.let { path.add(0, it) }
+                visited.contains(neighbour) -> return@neighbours
 
-                path.forEach { println(it.name) }
-                queue.clear()
+                else -> {
+                    pathes.forEach { if (it.city1 == curr && it.city2 == neighbour) neighbour.g += it.distance }
 
-            } else if (visited.contains(neighbour)) {
-                continue
-
-            } else {
-                pathes.forEach { if (it.city1 == curr && it.city2 == neighbour) neighbour.g += it.distance }
-
-                neighbour.prev = curr
-                queue.add(neighbour)
+                    neighbour.prev = curr
+                    queue.add(neighbour)
+                }
             }
         }
-
     }
 }
