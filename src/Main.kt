@@ -6,7 +6,7 @@ fun main() {
     val input = File("src/input.txt")
 
     val cities: ArrayList<City> = arrayListOf()
-    val pathes: ArrayList<Path> = arrayListOf()
+    val paths: ArrayList<Path> = arrayListOf()
 
     input.forEachLine { line ->
         val split = line.split(" ")
@@ -21,8 +21,8 @@ fun main() {
                     if (city.name == split[1]) city2 = city
                 }
                 if (city1 != null && city2 != null) {
-                    pathes.add(Path(city1 = city1, city2 = city2, distance = split[2].toInt()))
-                    pathes.add(Path(city1 = city2, city2 = city1, distance = split[2].toInt()))
+                    paths.add(Path(city1 = city1, city2 = city2, distance = split[2].toInt()))
+                    paths.add(Path(city1 = city2, city2 = city1, distance = split[2].toInt()))
                     city1.connections.add(city2)
                     city2.connections.add(city1)
                 }
@@ -62,7 +62,7 @@ fun main() {
                 visited.contains(neighbour) -> return@neighbours
 
                 else -> {
-                    pathes.forEach { if (it.city1 == curr && it.city2 == neighbour) neighbour.g += it.distance }
+                    paths.forEach { if (it.city1 == curr && it.city2 == neighbour) neighbour.g += it.distance }
 
                     neighbour.prev = curr
                     queue.add(neighbour)
